@@ -1,0 +1,5 @@
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: docker.io/hostpath
+volumeBindingMode: WaitForFirstConsumer

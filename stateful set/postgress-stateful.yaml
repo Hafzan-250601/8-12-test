@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: nginx
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres # has to match .spec.template.metadata.labels
+  serviceName: "postgres"
+  replicas: 2 # by default is 1
+  minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        app: postgres # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: postgress
+        image: postgres:latest
+        ports:
+        - containerPort: 80
+          name: postgres
+        volumeMounts:
+        - name: postgress
+          mountPath: /var/lib/postgresql/data
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRESS_DB
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: POSTGRES_DB
+  volumeClaimTemplates:
+  - metadata:
+      name: postgress
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "postgress-sc"
+      resources:
+        requests:
+          storage: 1Gi
