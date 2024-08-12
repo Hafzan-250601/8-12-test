@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx
+  name: postgres
   labels:
-    app: nginx
+    app: postgres
 spec:
   ports:
-  - port: 80
-    name: web
+  - port: 8080
+    name: postgress
   clusterIP: None
   selector:
-    app: nginx
+    app: postgres
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -33,7 +33,7 @@ spec:
       - name: postgress
         image: postgres:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           name: postgres
         volumeMounts:
         - name: postgress
