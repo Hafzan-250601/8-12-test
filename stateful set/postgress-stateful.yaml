@@ -59,7 +59,7 @@ spec:
       name: postgress
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "postgress-sc"
+      storageClassName: "local-storage"
       resources:
         requests:
           storage: 1Gi
